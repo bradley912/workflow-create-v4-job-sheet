@@ -1,0 +1,156 @@
+{
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "",
+        "options": {
+          "rawBody": true,
+          "responseCode": {
+            "values": {}
+          },
+          "responseData": "{\"status\": \"success\", \"message\": \"Job sheet created successfully\"}",
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Content-Type",
+                "value": "application/json"
+              }
+            ]
+          }
+        }
+      },
+      "id": "5aa7a170-115f-475f-8147-ce13fae5a845",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const now = new Date().toISOString();\nconst body = $json.body;\n\nreturn [\n  {\n    json: {\n      job_id: body.job_id,\n      job_name: body.job_name,\n      category: body.category,\n      status: body.status ?? 'Draft',\n      assigned_worker: body.assigned_worker,\n      priority: body.priority ?? 'Medium',\n      date_created: body.date_created ? new Date(body.date_created).toISOString() : now,\n      last_updated: body.last_updated ? new Date(body.last_updated).toISOString() : now,\n      purpose: body.purpose,\n      expected_outcome: body.expected_outcome,\n      trigger_origin: body.trigger_origin,\n      complexity_level: body.complexity_level,\n      current_state: body.current_state,\n    },\n  },\n];\n"
+      },
+      "id": "47947775-02ae-4432-9d64-f7ddd7afafb0",
+      "name": "Process Job Sheet Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "RpRjIT9cIGn3SPpU"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_id": "={{ $json.job_id }}",
+            "job_name": "={{ $json.job_name }}",
+            "category": "={{ $json.category }}",
+            "status": "={{ $json.status }}",
+            "assigned_worker": "={{ $json.assigned_worker }}",
+            "priority": "={{ $json.priority }}",
+            "date_created": "={{ $json.date_created }}",
+            "last_updated": "={{ $json.last_updated }}",
+            "purpose": "={{ $json.purpose }}",
+            "expected_outcome": "={{ $json.expected_outcome }}",
+            "trigger_origin": "={{ $json.trigger_origin }}",
+            "complexity_level": "={{ $json.complexity_level }}",
+            "current_state": "={{ $json.current_state }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "d650998f-ec2f-4776-acc3-8766d4b2f5c7",
+      "name": "Write to Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "5933581740",
+        "text": "New V4 Job Sheet Created:\nID: `={{ $json.job_id }}`\nName: `={{ $json.job_name }}`\nCategory: `={{ $json.category }}`\nStatus: `={{ $json.status }}`\n\nPurpose: `={{ $json.purpose.substring(0, 100) }}`...\n\n",
+        "additionalFields": {
+          "parseMode": "Markdown"
+        }
+      },
+      "id": "8ca6f396-229b-497a-8b34-e8284b470d62",
+      "name": "Telegram Notification",
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "credentials": {
+        "telegramApi": "Telegram Account"
+      },
+      "position": [
+        672,
+        0
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": [
+      {
+        "node": "Process Job Sheet Data",
+        "type": "main",
+        "index": 0
+      }
+    ],
+    "Process Job Sheet Data": [
+      {
+        "node": "Write to Data Table",
+        "type": "main",
+        "index": 0
+      }
+    ],
+    "Write to Data Table": [
+      {
+        "node": "Telegram Notification",
+        "type": "main",
+        "index": 0
+      }
+    ]
+  },
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "name": "Create V4 Job Sheet",
+  "version": 1,
+  "active": true,
+  "nodesPositions": {
+    "Webhook Trigger": [
+      0,
+      0
+    ],
+    "Process Job Sheet Data": [
+      224,
+      0
+    ],
+    "Write to Data Table": [
+      448,
+      0
+    ],
+    "Telegram Notification": [
+      672,
+      0
+    ]
+  },
+  "settings": {
+    "errorWorkflow": "s6J37z0DaWBKrdki"
+  }
+}
