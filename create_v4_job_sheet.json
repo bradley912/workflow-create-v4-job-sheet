@@ -32,7 +32,7 @@
     {
       "parameters": {
         "mode": "runOnceForEachItem",
-        "jsCode": "const now = new Date().toISOString();\nconst body = $json.body;\n\nreturn [\n  {\n    json: {\n      job_id: body.job_id,\n      job_name: body.job_name,\n      category: body.category,\n      status: body.status ?? 'Draft',\n      assigned_worker: body.assigned_worker,\n      priority: body.priority ?? 'Medium',\n      date_created: body.date_created ? new Date(body.date_created).toISOString() : now,\n      last_updated: body.last_updated ? new Date(body.last_updated).toISOString() : now,\n      purpose: body.purpose,\n      expected_outcome: body.expected_outcome,\n      trigger_origin: body.trigger_origin,\n      complexity_level: body.complexity_level,\n      current_state: body.current_state,\n    },\n  },\n];\n"
+        "jsCode": "const now = new Date().toISOString();\nconst body = $json.body;\n\nconst data = {\n  job_id: body.job_id,\n  job_name: body.job_name,\n  category: body.category,\n  status: body.status ?? 'Draft',\n  assigned_worker: body.assigned_worker,\n  priority: body.priority ?? 'Medium',\n  date_created: body.date_created ? new Date(body.date_created).toISOString() : now,\n  last_updated: body.last_updated ? new Date(body.last_updated).toISOString() : now,\n  purpose: body.purpose,\n  expected_outcome: body.expected_outcome,\n  trigger_origin: body.trigger_origin,\n  complexity_level: body.complexity_level,\n  current_state: body.current_state,\n};\n\nreturn [\n  {\n    json: data,\n  },\n];\n"
       },
       "id": "47947775-02ae-4432-9d64-f7ddd7afafb0",
       "name": "Process Job Sheet Data",
@@ -89,7 +89,7 @@
           "parseMode": "Markdown"
         }
       },
-      "id": "8ca6f396-229b-497a-8b34-e8284b470d62",
+      "id": "8ca6f396-229b-497a-b834-e8284b470d62",
       "name": "Telegram Notification",
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
